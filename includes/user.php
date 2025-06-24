@@ -86,7 +86,31 @@ function bogo_switch_user_locale() {
 	}
 }
 
+add_action( 'admin_init', 'bogo_set_admin_lang_parameter', 5 );
+
+function bogo_set_admin_lang_parameter() {
+	// Don't redirect on AJAX, cron, or if lang parameter already exists
+	if ( wp_doing_ajax() || defined( 'DOING_CRON' ) || ! empty( $_GET['lang'] ) ) {
+		return;
+	}
+
+	$user_locale = get_user_option( 'locale', get_current_user_id() );
+	$default_locale = bogo_get_default_locale();
+
+	// Only add lang parameter if user has a specific locale different from default
+	if ( ! empty( $user_locale ) ) {
+		$current_url = $_SERVER['REQUEST_URI'];
+		$new_url = add_query_arg( 'lang', $user_locale, $current_url );
+		
+		if ( $new_url !== $current_url ) {
+			wp_safe_redirect( $new_url );
+			exit;
+		}
+	}
+}
+
 function bogo_get_user_locale( $user_id = 0 ) {
+
 	$default_locale = bogo_get_default_locale();
 
 	if ( ! $user_id = absint( $user_id ) ) {
