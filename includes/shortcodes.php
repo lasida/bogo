@@ -10,6 +10,8 @@ function bogo_shortcode_callback( $atts, $content, $shortcode_tag ) {
 	switch ( $atts['view'] ) {
 		case 'suggestion':
 			return bogo_language_suggestion( 'echo=0' );
+		case 'dropdown':
+				return bogo_language_switcher_dropdown( 'echo=0' );
 		case 'list':
 		default:
 			return bogo_language_switcher( 'echo=0' );

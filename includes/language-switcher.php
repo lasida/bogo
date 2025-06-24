@@ -3,7 +3,12 @@
 function bogo_language_switcher( $args = '' ) {
 	$args = wp_parse_args( $args, array(
 		'echo' => false,
+		'view' => 'list',
 	) );
+
+	if ( 'dropdown' === $args['view'] ) {
+		return bogo_language_switcher_dropdown( $args );
+	}
 
 	$links = bogo_language_switcher_links( $args );
 	$total = count( $links );
@@ -92,7 +97,6 @@ function bogo_language_switcher( $args = '' ) {
 		return $output;
 	}
 }
-
 
 function bogo_language_suggestion( $args = '' ) {
 	$args = wp_parse_args( $args, array(
@@ -220,4 +224,44 @@ function bogo_language_switcher_links( $args = '' ) {
 	}
 
 	return apply_filters( 'bogo_language_switcher_links', $links, $args );
+}
+
+
+function bogo_language_switcher_dropdown( $args = '' ) {
+	$args = wp_parse_args( $args, array(
+		'echo' => false,
+	) );
+
+	$links = bogo_language_switcher_links( $args );
+	$current_locale = get_locale();
+
+	$output = '<select class="bogo-language-switcher dropdown-view" style="padding:4px; border:1px solid #ccc; border-radius:4px; background:#fff; font-size:14px;" onchange="if(this.value) window.location.href=this.value">';
+	
+	foreach ( $links as $link ) {
+		// Show the language code and country code after underscore, e.g. en_US -> EN
+		if ( strpos( $link['locale'], '_' ) !== false ) {
+			list( $lang, $country ) = explode( '_', $link['locale'], 2 );
+			$label = strtoupper( $lang );
+		} else {
+			$label = strtoupper( $link['locale'] );
+		}
+		$selected = ( $current_locale === $link['locale'] ) ? ' selected="selected"' : '';
+		
+		$output .= sprintf(
+			'<option value="%s"%s>%s</option>',
+			esc_attr( $link['href'] ),
+			$selected,
+			esc_html( $label )
+		);
+	}
+	
+	$output .= '</select>';
+
+	$output = apply_filters( 'bogo_language_switcher_dropdown', $output, $args );
+
+	if ( $args['echo'] ) {
+		echo $output;
+	} else {
+		return $output;
+	}
 }
