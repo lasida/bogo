@@ -90,7 +90,12 @@ add_action( 'admin_init', 'bogo_set_admin_lang_parameter', 5 );
 
 function bogo_set_admin_lang_parameter() {
 	// Don't redirect on AJAX, cron, or if lang parameter already exists
-	if ( wp_doing_ajax() || defined( 'DOING_CRON' ) || ! empty( $_GET['lang'] ) ) {
+	if (
+		wp_doing_ajax() ||
+		defined( 'DOING_CRON' ) ||
+		! empty( $_GET['lang'] ) ||
+		empty( $_GET['post_type'] )
+	) {
 		return;
 	}
 
